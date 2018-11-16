@@ -10,9 +10,9 @@ std::string message_concat() {
 	return "\n";
 }
 
-template <class First, typename ...Args>
+template <typename First, typename ...Args>
 std::string message_concat(First first, Args... args) {
-	return first + message_concat(args);
+	return first + message_concat(std::forward<Args>(args)...);
 }
 
 template <typename TErr>
@@ -20,27 +20,18 @@ void screen_logger(TErr error, std::string result) {
 	std::cout << "log_level:: " << error << ' ' << result << std::endl;
 }
 
-template<typename TErr, typename ...Args>
-void log(TErr error, Args... args) {
+template<class TFunc, typename TErr, typename ...Args>
+void log(TFunc (*func)(TErr, std::string), TErr error, Args... args) {
 	std::string result = message_concat(std::forward<Args>(args)...);
-	screen_logger(error, result);
+	func(error, result);
 }
-
 
 
 int main()
 {
     
-	log(45, "Ip address ", "10", "has been blocekd? port = ", "80");
-
-	/*log(
-		screen_logger
-		log_level::error,
-		"Ip address ",
-		ip_host,
-		" has been blocked, port=",
-		port,
-		);*/
+	log<void, int>(screen_logger<int>, 45, "Ip address", "10", "has been blocked, port = ", "80");
+	getchar();
 
 }
 
