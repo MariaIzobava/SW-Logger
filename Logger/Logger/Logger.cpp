@@ -5,6 +5,12 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <sstream>
+
+template <typename TErr>
+void screen_logger(TErr error, std::string result) {
+	std::cout << "log_level:: " << error << "\n" << result << std::endl;
+}
 
 std::string message_concat() {
 	return "\n";
@@ -12,27 +18,28 @@ std::string message_concat() {
 
 template <typename First, typename ...Args>
 std::string message_concat(First first, Args... args) {
-	return first + message_concat(std::forward<Args>(args)...);
-}
-
-template <typename TErr>
-void screen_logger(TErr error, std::string result) {
-	std::cout << "log_level:: " << error << ' ' << result << std::endl;
+	std::stringstream ss;
+	ss << " " << first;
+	return ss.str() + message_concat(std::forward<Args>(args)...);
 }
 
 template<class TFunc, typename TErr, typename ...Args>
-void log(TFunc (*func)(TErr, std::string), TErr error, Args... args) {
+void log(TFunc (*output_func)(TErr, std::string), TErr error, Args... args) {
 	std::string result = message_concat(std::forward<Args>(args)...);
-	func(error, result);
+	output_func(error, result);
 }
 
 
 int main()
 {
-    
-	log<void, int>(screen_logger<int>, 45, "Ip address", "10", "has been blocked, port = ", "80");
-	getchar();
 
+	log(screen_logger<int>, 
+					45, 
+					"Ip address", 
+					10, 
+					"has been blocked, port", 
+					80);
+	getchar();
 }
 
 
