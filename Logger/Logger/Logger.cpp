@@ -7,9 +7,9 @@
 #include <string>
 #include <sstream>
 
-template <typename TErr>
+template <class TErr>
 void screen_logger(TErr error, std::string result) {
-	std::cout << "log_level:: " << error << "\n" << result << std::endl;
+	std::cout << "log_level:: " << error << " -" << result;
 }
 
 std::string message_concat() {
@@ -23,8 +23,8 @@ std::string message_concat(First first, Args... args) {
 	return ss.str() + message_concat(std::forward<Args>(args)...);
 }
 
-template<class TFunc, typename TErr, typename ...Args>
-void log(TFunc (*output_func)(TErr, std::string), TErr error, Args... args) {
+template<class TErr, typename ...Args>
+void log(void (*output_func)(TErr, std::string), TErr error, Args... args) {
 	std::string result = message_concat(std::forward<Args>(args)...);
 	output_func(error, result);
 }
@@ -33,12 +33,31 @@ void log(TFunc (*output_func)(TErr, std::string), TErr error, Args... args) {
 int main()
 {
 
-	log(screen_logger<int>, 
+	log(screen_logger, 
 					45, 
 					"Ip address", 
-					10, 
+					"10.0.0.10", 
 					"has been blocked, port", 
 					80);
+	log(screen_logger,
+		"UNKNOWN_ERROR",
+		"Exit code",
+		13.13);
+
+	log(screen_logger,
+		false
+		);
+
+	log(screen_logger,
+		"DEAD BEAF",
+		'E',
+		'R',
+		'R',
+		'O',
+		'R',
+		'-',
+		"1101 1110 1010 1101 1011 1110 1010 1111"
+	);
 	getchar();
 }
 
